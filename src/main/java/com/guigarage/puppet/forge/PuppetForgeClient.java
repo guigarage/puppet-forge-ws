@@ -10,7 +10,9 @@ import java.util.List;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.FileNameUtil;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.MappingJsonFactory;
@@ -82,6 +84,10 @@ public class PuppetForgeClient {
 		        }
 		    }
 		    tarIn.close();
+		    File currentFolder = new File(modulesPath, FilenameUtils.getBaseName(FilenameUtils.getBaseName(module.getFile())));
+		    if(currentFolder.exists() && currentFolder.isDirectory()) {
+		    	currentFolder.renameTo(new File(modulesPath, currentFolder.getName().split("-")[1]));
+		    }
 		} else if(module.getFile().endsWith(".tar")) {
 			URL url = new URL(repositoryUrl + module.getFile());
 			URLConnection connection = url.openConnection();
@@ -102,6 +108,10 @@ public class PuppetForgeClient {
 		        }
 		    }
 		    tarIn.close();
+		    File currentFolder = new File(modulesPath, FilenameUtils.getBaseName(module.getFile()));
+		    if(currentFolder.exists() && currentFolder.isDirectory()) {
+		    	currentFolder.renameTo(new File(modulesPath, currentFolder.getName().split("-")[1]));
+		    }
 		} else {
 			throw new IOException("Unknown module file format for " + module.getFile());
 		}
